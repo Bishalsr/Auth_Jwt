@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from .models import User
+import uuid
+from django.contrib.auth.password_validation import validate_password
 
 class RegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -20,6 +22,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         
         user = User(
             email = validated_data['email'],
+            username=str(uuid.uuid4())[:30],
             is_active = False
         )
         
@@ -51,3 +54,8 @@ class LoginSerializer(serializers.Serializer):
         return attrs
         
         
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    new_password = serializers.CharField(write_only=True, validators=[validate_password])            
